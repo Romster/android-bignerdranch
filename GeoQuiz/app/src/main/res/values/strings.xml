@@ -1,15 +1,20 @@
 <resources>
-    <string name="app_name">GeoQuiz</string>
-    <string name="action_settings">Settings</string>
-    <string name="true_button">Да</string>
-    <string name="false_button">Нет</string>
-    <string name="correct_toast">Верно!</string>
-    <string name="incorrect_toast">Неверно!</string>
+	<string name="app_name">GeoQuiz</string>
+	<string name="action_settings">Settings</string>
+	<string name="true_button">Да</string>
+	<string name="false_button">Нет</string>
+	<string name="correct_toast">Верно!</string>
+	<string name="incorrect_toast">Неверно!</string>
 	<string name="prev_button">Назад</string>
-    <string name="next_button">Далее</string>
-    <string name="question_ocens">Тихий океан больше чем Атлантический.</string>
-    <string name="question_mideast">Суэцкий канал соединяет Красное море и Индийский океан.</string>
-    <string name="question_africa">Исток Нила находится в Египте.</string>
-    <string name="question_americas">Амазонка - самая длинная река в Америке.</string>
-    <string name="question_asia">Озеро Байкал - самое большое и глубокое пресное озеро.</string>
+	<string name="next_button">Далее</string>
+	<string name="question_ocens">Тихий океан больше чем Атлантический.</string>
+	<string name="question_mideast">Суэцкий канал соединяет Красное море и Индийский океан.</string>
+	<string name="question_africa">Исток Нила находится в Египте.</string>
+	<string name="question_americas">Амазонка - самая длинная река в Америке.</string>
+	<string name="question_asia">Озеро Байкал - самое большое и глубокое пресное озеро.</string>
+	<string name="warning_text">Вы уверены?</string>
+	<string name="show_answer">Показать ответ</string>
+	<string name="cheat_button">Сжульничать!</string>
+	<string name="judgment_toast">Жульничать плохо.</string>
+	<string name="title_activity_cheat">Cheat</string>
 </resources>

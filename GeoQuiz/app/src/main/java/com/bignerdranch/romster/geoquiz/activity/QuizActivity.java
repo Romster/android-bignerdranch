@@ -1,7 +1,7 @@
-package com.bignerdranch.romster.geoquiz;
+package com.bignerdranch.romster.geoquiz.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -12,18 +12,23 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bignerdranch.romster.geoquiz.R;
 import com.bignerdranch.romster.geoquiz.model.Question;
 
 public class QuizActivity extends AppCompatActivity {
 
+
 	private static final String TAG = QuizActivity.class.getName();
 
 	private static final String KEY_INDEX = "index";
+	private static final String KEY_CHEATED_ARRAY = "cheated_array";
+	private static final int REQUEST_CODE_CHEAT = 0x0;
 
 	private final View.OnClickListener onClickListener;
 
 	private Button trueButton;
 	private Button falseButton;
+	private Button cheatButton;
 	private ImageButton nextButton;
 	private ImageButton prevButton;
 	private TextView questionTextView;
@@ -36,6 +41,9 @@ public class QuizActivity extends AppCompatActivity {
 			new Question(R.string.question_americas, true),
 			new Question(R.string.question_asia, true)
 	};
+
+	private boolean[] cheatedQuestions = new boolean[questionBank.length];
+
 	private int currentIndex = 0;
 
 	@Override
@@ -44,11 +52,13 @@ public class QuizActivity extends AppCompatActivity {
 		Log.d(TAG, "onCreate called");
 		if(savedInstanceState != null) {
 			currentIndex = savedInstanceState.getInt(KEY_INDEX, 0);
+			cheatedQuestions = savedInstanceState.getBooleanArray(KEY_CHEATED_ARRAY);
 		}
 		setContentView(R.layout.activity_quiz);
 
 		trueButton = (Button) findViewById(R.id.true_button);
 		falseButton = (Button) findViewById(R.id.false_button);
+		cheatButton = (Button) findViewById(R.id.cheat_button);
 		nextButton = (ImageButton) findViewById(R.id.next_button);
 		prevButton = (ImageButton) findViewById(R.id.prev_button);
 		questionTextView = (TextView) findViewById(R.id.question_text_view);
@@ -57,6 +67,7 @@ public class QuizActivity extends AppCompatActivity {
 		falseButton.setOnClickListener(onClickListener);
 		nextButton.setOnClickListener(onClickListener);
 		prevButton.setOnClickListener(onClickListener);
+		cheatButton.setOnClickListener(onClickListener);
 
 		updateQuestion();
 	}
@@ -84,6 +95,17 @@ public class QuizActivity extends AppCompatActivity {
 		super.onSaveInstanceState(outState);
 		Log.i(TAG, "onSaveInstanceState");
 		outState.putInt(KEY_INDEX, currentIndex);
+		outState.putBooleanArray(KEY_CHEATED_ARRAY, cheatedQuestions);
+	}
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_CHEAT) {
+			if(data != null) {
+				boolean isCheater = CheatActivity.wasAnswerShown(data);
+				cheatedQuestions[currentIndex] = isCheater;
+			}
+		}
 	}
 
 	@Override
@@ -124,14 +146,17 @@ public class QuizActivity extends AppCompatActivity {
 	private void checkAnswer(boolean answer) {
 		boolean correctAnswer = questionBank[currentIndex].isAnswerTrue();
 		int messageId;
-		if(answer == correctAnswer) {
-			messageId = R.string.correct_toast;
+		if(cheatedQuestions[currentIndex]) {
+			messageId = R.string.judgment_toast;
 		} else {
-			messageId = R.string.incorrect_toast;
+			if (answer == correctAnswer) {
+				messageId = R.string.correct_toast;
+			} else {
+				messageId = R.string.incorrect_toast;
+			}
 		}
 		Toast.makeText(this, messageId, Toast.LENGTH_SHORT).show();
 	}
-
 
 	////////////////////////////////////////////////
 	///////////////Initialization block/////////////
@@ -149,13 +174,20 @@ public class QuizActivity extends AppCompatActivity {
 						checkAnswer(false);
 						break;
 					}
+					case R.id.cheat_button: {
+						boolean isAnswerTrue = questionBank[currentIndex].isAnswerTrue();
+						boolean wasCheated = cheatedQuestions[currentIndex];
+						Intent i = CheatActivity.newIntent(QuizActivity.this, isAnswerTrue, wasCheated);
+						startActivityForResult(i, REQUEST_CODE_CHEAT);
+						break;
+					}
 					case R.id.prev_button: {
 						currentIndex = currentIndex > 0? currentIndex - 1 : questionBank.length - 1;
 						updateQuestion();
 						break;
 					}
-					case R.id.question_text_view:
-					case R.id.next_button: {
+					case R.id.next_button:
+					case R.id.question_text_view:{
 						currentIndex = (currentIndex + 1) % questionBank.length;
 						updateQuestion();
 						break;
