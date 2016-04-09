@@ -1,4 +1,4 @@
-package ru.romster.bignerdranch.criminalintent.controller;
+package ru.romster.bignerdranch.criminalintent.controller.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
