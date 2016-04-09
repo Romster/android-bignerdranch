@@ -14,6 +14,7 @@ import android.widget.EditText;
 import ru.romster.bignerdranch.criminalintent.R;
 import ru.romster.bignerdranch.criminalintent.model.Crime;
 import ru.romster.bignerdranch.criminalintent.util.TextChangeListener;
+import ru.romster.bignerdranch.criminalintent.util.Utils;
 
 /**
  * Created by romster on 07/04/16.
@@ -47,7 +48,7 @@ public class CrimeFragment extends Fragment {
 		});
 
 		dateButton = (Button) v.findViewById(R.id.crime_date);
-		dateButton.setText(crime.getDate().toString());
+		dateButton.setText(Utils.convertDateToString(crime.getDate()));
 		dateButton.setEnabled(false);
 
 		solvedCheckBox = (CheckBox) v.findViewById(R.id.crime_solved);
@@ -61,5 +62,6 @@ public class CrimeFragment extends Fragment {
 		return v;
 
 	}
+
 
 }
