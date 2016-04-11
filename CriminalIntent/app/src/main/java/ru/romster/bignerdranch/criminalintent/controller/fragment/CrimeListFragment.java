@@ -1,5 +1,6 @@
 package ru.romster.bignerdranch.criminalintent.controller.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,9 +13,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.UUID;
 
 import ru.romster.bignerdranch.criminalintent.R;
 import ru.romster.bignerdranch.criminalintent.controller.CrimeLab;
+import ru.romster.bignerdranch.criminalintent.controller.activity.CrimeActivity;
 import ru.romster.bignerdranch.criminalintent.model.Crime;
 import ru.romster.bignerdranch.criminalintent.util.Utils;
 
@@ -22,6 +25,9 @@ import ru.romster.bignerdranch.criminalintent.util.Utils;
  * Created by romster on 09/04/16.
  */
 public class CrimeListFragment extends Fragment {
+
+	private static final int REQUEST_CRIME_EDIT = 1;
+
 	private RecyclerView recyclerView;
 	private CrimeAdapter adapter;
 
@@ -34,11 +40,29 @@ public class CrimeListFragment extends Fragment {
 		return v;
 	}
 
-	private void updateUI(){
-		CrimeLab crimeLab = CrimeLab.getInstance(getActivity());
-		List<Crime> crimes = crimeLab.getCrimeList();
-		adapter = new CrimeAdapter(crimes);
-		recyclerView .setAdapter(adapter);
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if(requestCode == REQUEST_CRIME_EDIT) {
+			CrimeLab.CrimeLock lock = getCrimeLab().freeCrimeLock();
+			if(lock != null) {
+				adapter.notifyItemChanged(lock.crimePosition);
+			}
+		}
+	}
+
+	private void updateUI() {
+		if (adapter == null) {
+			CrimeLab crimeLab = getCrimeLab();
+			List<Crime> crimes = crimeLab.getCrimeList();
+			adapter = new CrimeAdapter(crimes);
+			recyclerView.setAdapter(adapter);
+		} else {
+			adapter.notifyDataSetChanged();
+		}
+	}
+
+	private CrimeLab getCrimeLab() {
+		return CrimeLab.getInstance(getContext());
 	}
 
 	private class CrimeHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
@@ -66,7 +90,9 @@ public class CrimeListFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-			Toast.makeText(getActivity(), crime.getTitle() + " clicked!", Toast.LENGTH_SHORT).show();
+			Intent intent = CrimeActivity.newIntent(getContext(), crime.getId());
+			getCrimeLab().lockCrime(crime.getId());
+			startActivityForResult(intent, REQUEST_CRIME_EDIT);
 		}
 	}
 
@@ -97,7 +123,6 @@ public class CrimeListFragment extends Fragment {
 
 
 	}
-
 
 
 }

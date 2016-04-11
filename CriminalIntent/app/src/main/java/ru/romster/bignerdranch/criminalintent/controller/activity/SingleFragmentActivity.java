@@ -12,7 +12,7 @@ import ru.romster.bignerdranch.criminalintent.R;
 /**
  * Created by romster on 09/04/16.
  */
-public abstract class SingleActivityFragment extends FragmentActivity {
+public abstract class SingleFragmentActivity extends FragmentActivity {
 
 	protected abstract Fragment createFragment();
 
