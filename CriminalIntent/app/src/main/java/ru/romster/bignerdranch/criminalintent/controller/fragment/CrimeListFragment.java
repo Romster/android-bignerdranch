@@ -10,14 +10,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.List;
-import java.util.UUID;
 
 import ru.romster.bignerdranch.criminalintent.R;
 import ru.romster.bignerdranch.criminalintent.controller.CrimeLab;
-import ru.romster.bignerdranch.criminalintent.controller.activity.CrimeActivity;
+import ru.romster.bignerdranch.criminalintent.controller.activity.CrimePagerActivity;
 import ru.romster.bignerdranch.criminalintent.model.Crime;
 import ru.romster.bignerdranch.criminalintent.util.Utils;
 
@@ -43,10 +41,7 @@ public class CrimeListFragment extends Fragment {
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if(requestCode == REQUEST_CRIME_EDIT) {
-			CrimeLab.CrimeLock lock = getCrimeLab().freeCrimeLock();
-			if(lock != null) {
-				adapter.notifyItemChanged(lock.crimePosition);
-			}
+				adapter.notifyDataSetChanged();
 		}
 	}
 
@@ -90,8 +85,7 @@ public class CrimeListFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = CrimeActivity.newIntent(getContext(), crime.getId());
-			getCrimeLab().lockCrime(crime.getId());
+			Intent intent = CrimePagerActivity.newIntent(getContext(), crime.getId());
 			startActivityForResult(intent, REQUEST_CRIME_EDIT);
 		}
 	}

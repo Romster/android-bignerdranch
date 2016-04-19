@@ -47,8 +47,7 @@ public class CrimeFragment extends Fragment {
 		UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
 		crime = CrimeLab.getInstance(getContext()).getCrime(crimeId);
 	}
-
-	@Nullable
+	
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.fragment_crime, container, false);

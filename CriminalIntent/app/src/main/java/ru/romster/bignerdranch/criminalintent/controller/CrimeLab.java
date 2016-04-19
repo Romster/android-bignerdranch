@@ -17,8 +17,7 @@ public class CrimeLab {
 	private final Context appContext;
 	private final List<Crime> crimeList;
 
-	private volatile CrimeLock crimeLock;
-	
+
 	public static CrimeLab getInstance(Context context) {
 		if (instance == null) {
 			synchronized (CrimeLab.class) {
@@ -29,7 +28,6 @@ public class CrimeLab {
 		}
 		return instance;
 	}
-
 
 	public List<Crime> getCrimeList() {
 		return crimeList;
@@ -44,27 +42,6 @@ public class CrimeLab {
 		return null;
 	}
 
-	/**
-	 * lock crime for editing
-	 *
-	 * @param crimeId
-	 */
-	public synchronized void lockCrime(UUID crimeId) {
-		if (crimeLock != null) {
-			throw new IllegalStateException("CrimeLab already has lock: " + crimeLock.crimeUUID);
-		}
-		crimeLock = new CrimeLock(crimeId);
-	}
-
-	/**
-	 * @return null if no crime was locked
-	 */
-	public synchronized CrimeLock freeCrimeLock() {
-		CrimeLock result = crimeLock;
-		crimeLock = null;
-		return result;
-	}
-
 	private CrimeLab(Context appContext) {
 		this.appContext = appContext;
 		this.crimeList = new ArrayList<>();
@@ -75,23 +52,5 @@ public class CrimeLab {
 			crime.setSolved(i % 2 == 0);
 			crimeList.add(crime);
 		}
-	}
-
-
-	public class CrimeLock {
-		public final UUID crimeUUID;
-		public final int crimePosition;
-
-		private CrimeLock(UUID crimeUUID) {
-			this.crimeUUID = crimeUUID;
-			for (int i = 0; i < crimeList.size(); i++) {
-				if (crimeList.get(i).getId().equals(crimeUUID)) {
-					crimePosition = i;
-					return;
-				}
-			}
-			throw new IllegalArgumentException("Can not lock crime with id: " + crimeUUID);
-		}
-
 	}
 }
