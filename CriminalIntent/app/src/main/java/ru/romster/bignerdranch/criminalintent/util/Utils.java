@@ -14,4 +14,14 @@ public class Utils {
 		return df.format(date);
 
 	}
+
+	public static String convertTimeToString(Date date) {
+		DateFormat df = new SimpleDateFormat("HH : mm");
+		return df.format(date);
+	}
+
+	public static String convertTimestampToString(Date date) {
+		DateFormat df = new SimpleDateFormat("EEEE, MMM d, yyyy HH:mm");
+		return df.format(date);
+	}
 }
