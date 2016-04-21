@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import ru.romster.bignerdranch.criminalintent.R;
 import ru.romster.bignerdranch.criminalintent.controller.CrimeLab;
+import ru.romster.bignerdranch.criminalintent.controller.activity.DatePickerActivity;
 import ru.romster.bignerdranch.criminalintent.model.Crime;
 import ru.romster.bignerdranch.criminalintent.util.TextChangeListener;
 import ru.romster.bignerdranch.criminalintent.util.Utils;
@@ -76,10 +77,13 @@ public class CrimeFragment extends Fragment {
 		dateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				FragmentManager fragmentManager = getFragmentManager();
-				DatePickerFragment dialog = DatePickerFragment.newInstance(crime.getDate());
-				dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
-				dialog.show(fragmentManager, DIALOG_DATE);
+				startActivityForResult(
+						DatePickerActivity.newIntent(getActivity(), crime.getDate()),
+						REQUEST_DATE);
+//				FragmentManager fragmentManager = getFragmentManager();
+//				DatePickerFragment dialog = DatePickerFragment.newInstance(crime.getDate());
+//				dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);
+//				dialog.show(fragmentManager, DIALOG_DATE);
 			}
 		});
 		updateDate();
