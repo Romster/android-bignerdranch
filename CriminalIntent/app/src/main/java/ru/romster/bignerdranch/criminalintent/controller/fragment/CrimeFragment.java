@@ -7,6 +7,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -53,6 +56,7 @@ public class CrimeFragment extends Fragment {
 		super.onCreate(savedInstanceState);
 		UUID crimeId = (UUID) getArguments().getSerializable(ARG_CRIME_ID);
 		crime = CrimeLab.getInstance(getContext()).getCrime(crimeId);
+		setHasOptionsMenu(true);
 	}
 
 	@Override
@@ -70,7 +74,7 @@ public class CrimeFragment extends Fragment {
 
 		dateButton = (Button) v.findViewById(R.id.crime_date);
 		updateDate();
-		
+
 		dateButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -96,14 +100,35 @@ public class CrimeFragment extends Fragment {
 
 	@Override
 	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if(resultCode != Activity.RESULT_OK) return;
+		if (resultCode != Activity.RESULT_OK) return;
 
-		if(requestCode == REQUEST_DATE) {
+		if (requestCode == REQUEST_DATE) {
 			Date date = (Date) data.getSerializableExtra(DatePickerFragment.EXTRA_DATE);
 			crime.setDate(date);
 			updateDate();
 		}
 
+	}
+
+
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+		super.onCreateOptionsMenu(menu, inflater);
+		inflater.inflate(R.menu.fragment_crime, menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+			case R.id.menu_item_delete_crime: {
+				CrimeLab.getInstance(getActivity()).delete(crime.getId());
+				getActivity().finish();
+				return true;
+			}
+			default: {
+				return super.onOptionsItemSelected(item);
+			}
+		}
 	}
 
 	private void updateDate() {

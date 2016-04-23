@@ -3,6 +3,7 @@ package ru.romster.bignerdranch.criminalintent.controller;
 import android.content.Context;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,6 +32,17 @@ public class CrimeLab {
 
 	public void addCrime(Crime c) {
 		crimeList.add(c);
+	}
+
+
+	public void delete(UUID crimeId) {
+		Iterator<Crime> iterator = crimeList.iterator();
+		while (iterator.hasNext()) {
+			Crime c = iterator.next();
+			if (c.getId().equals(crimeId)) {
+				iterator.remove();
+			}
+		}
 	}
 
 	public List<Crime> getCrimeList() {
