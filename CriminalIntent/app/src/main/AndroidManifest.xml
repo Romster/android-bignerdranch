@@ -17,7 +17,9 @@
 			</intent-filter>
 		</activity>
 
-		<activity android:name=".controller.activity.CrimePagerActivity">
+		<activity android:name=".controller.activity.CrimePagerActivity"
+			android:label="@string/app_name"
+			android:parentActivityName=".controller.activity.CrimeListActivity">
 		</activity>
 
 	</application>

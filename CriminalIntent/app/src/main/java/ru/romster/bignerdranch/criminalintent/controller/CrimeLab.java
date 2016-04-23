@@ -17,7 +17,6 @@ public class CrimeLab {
 	private final Context appContext;
 	private final List<Crime> crimeList;
 
-
 	public static CrimeLab getInstance(Context context) {
 		if (instance == null) {
 			synchronized (CrimeLab.class) {
@@ -27,6 +26,11 @@ public class CrimeLab {
 			}
 		}
 		return instance;
+	}
+
+
+	public void addCrime(Crime c) {
+		crimeList.add(c);
 	}
 
 	public List<Crime> getCrimeList() {
@@ -45,12 +49,5 @@ public class CrimeLab {
 	private CrimeLab(Context appContext) {
 		this.appContext = appContext;
 		this.crimeList = new ArrayList<>();
-
-		for (int i = 0; i < 100; i++) {
-			Crime crime = new Crime();
-			crime.setTitle("Crime #" + i);
-			crime.setSolved(i % 2 == 0);
-			crimeList.add(crime);
-		}
 	}
 }
