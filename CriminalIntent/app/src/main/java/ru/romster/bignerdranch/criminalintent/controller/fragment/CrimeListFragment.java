@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ru.romster.bignerdranch.criminalintent.R;
@@ -110,6 +111,8 @@ public class CrimeListFragment extends Fragment {
 			adapter = new CrimeAdapter(crimes);
 			recyclerView.setAdapter(adapter);
 		} else {
+			List<Crime> crimeList = CrimeLab.getInstance(getActivity()).getCrimeList();
+			adapter.setCrimes(crimeList);
 			adapter.notifyDataSetChanged();
 		}
 		updateSubtitile();
@@ -185,6 +188,10 @@ public class CrimeListFragment extends Fragment {
 		@Override
 		public int getItemCount() {
 			return crimeList.size();
+		}
+
+		private void setCrimes(List<Crime> crimes) {
+			this.crimeList = new ArrayList<>(crimes);
 		}
 
 
