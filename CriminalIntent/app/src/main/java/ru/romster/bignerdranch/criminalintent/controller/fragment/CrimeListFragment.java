@@ -105,14 +105,13 @@ public class CrimeListFragment extends Fragment {
 	}
 
 	private void updateUI() {
+		CrimeLab crimeLab = getCrimeLab();
+		List<Crime> crimes = crimeLab.getCrimeList();
 		if (adapter == null) {
-			CrimeLab crimeLab = getCrimeLab();
-			List<Crime> crimes = crimeLab.getCrimeList();
 			adapter = new CrimeAdapter(crimes);
 			recyclerView.setAdapter(adapter);
 		} else {
-			List<Crime> crimeList = CrimeLab.getInstance(getActivity()).getCrimeList();
-			adapter.setCrimes(crimeList);
+			adapter.setCrimes(crimes);
 			adapter.notifyDataSetChanged();
 		}
 		updateSubtitile();
