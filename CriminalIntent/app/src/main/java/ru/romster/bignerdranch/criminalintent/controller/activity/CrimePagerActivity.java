@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 import ru.romster.bignerdranch.criminalintent.R;
-import ru.romster.bignerdranch.criminalintent.controller.CrimeLab;
+import ru.romster.bignerdranch.criminalintent.database.CrimeLab;
 import ru.romster.bignerdranch.criminalintent.controller.fragment.CrimeFragment;
 import ru.romster.bignerdranch.criminalintent.model.Crime;
 

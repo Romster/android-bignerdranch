@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ru.romster.bignerdranch.criminalintent.R;
-import ru.romster.bignerdranch.criminalintent.controller.CrimeLab;
+import ru.romster.bignerdranch.criminalintent.database.CrimeLab;
 import ru.romster.bignerdranch.criminalintent.controller.activity.CrimePagerActivity;
 import ru.romster.bignerdranch.criminalintent.model.Crime;
 import ru.romster.bignerdranch.criminalintent.util.Utils;
