@@ -1,6 +1,7 @@
 package ru.romster.bignerdranch.criminalintent.controller.fragment;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -57,6 +58,8 @@ public class CrimeFragment extends Fragment {
 	private Crime crime;
 	private File photoFile;
 
+	private Callbacks callbacks;
+
 	public static CrimeFragment newInstance(UUID crimeId) {
 		Bundle args = new Bundle();
 		args.putSerializable(ARG_CRIME_ID, crimeId);
@@ -84,6 +87,7 @@ public class CrimeFragment extends Fragment {
 			@Override
 			public void onTextChanged(CharSequence s, int start, int before, int count) {
 				crime.setTitle(s.toString());
+				updateCrime();
 			}
 		});
 
@@ -132,6 +136,7 @@ public class CrimeFragment extends Fragment {
 			@Override
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				crime.setSolved(isChecked);
+				updateCrime();
 			}
 		});
 
@@ -192,15 +197,38 @@ public class CrimeFragment extends Fragment {
 				c.moveToFirst();
 				String suspect = c.getString(0);
 				crime.setSuspect(suspect);
+				updateCrime();
 				suspectButton.setText(suspect);
-
 			} finally {
 				c.close();
 			}
 		} else if (requestCode == REQUEST_PHOTO) {
+			updateCrime();
 			updatePhotoView();
 		}
 
+	}
+
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		if(context instanceof Callbacks) {
+			callbacks = (Callbacks) context;
+		} else {
+			throw new IllegalStateException("Host activity must implements Callbacks interface");
+		}
+
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		callbacks = null;
+	}
+
+	private void updateCrime() {
+		CrimeLab.getInstance(getActivity()).updateCrime(crime);
+		callbacks.onCrimeUpdate(crime);
 	}
 
 	private void updateDate() {
@@ -237,6 +265,10 @@ public class CrimeFragment extends Fragment {
 		String report = getString(R.string.crime_report, crime.getTitle(), dateString, solvedString, suspect);
 
 		return report;
+	}
+
+	public interface Callbacks {
+		void onCrimeUpdate(Crime crime);
 	}
 
 }

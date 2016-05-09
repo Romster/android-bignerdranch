@@ -22,7 +22,7 @@ import ru.romster.bignerdranch.criminalintent.model.Crime;
 /**
  * Created by romster on 19/04/16.
  */
-public class CrimePagerActivity extends AppCompatActivity {
+public class CrimePagerActivity extends AppCompatActivity implements CrimeFragment.Callbacks{
 
 	public static final String EXTRA_CRIME_ID = "ru.romster.bignerdranch.criminalintent.crime_id";
 
@@ -65,5 +65,10 @@ public class CrimePagerActivity extends AppCompatActivity {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public void onCrimeUpdate(Crime crime) {
+
 	}
 }

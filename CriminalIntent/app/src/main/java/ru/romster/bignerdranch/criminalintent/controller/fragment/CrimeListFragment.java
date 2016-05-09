@@ -1,5 +1,6 @@
 package ru.romster.bignerdranch.criminalintent.controller.fragment;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -36,6 +37,8 @@ public class CrimeListFragment extends Fragment {
 	private RecyclerView recyclerView;
 	private CrimeAdapter adapter;
 	private boolean subtitleVisible;
+
+	private Callbacks callbacks;
 
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,8 +91,8 @@ public class CrimeListFragment extends Fragment {
 			case R.id.menu_item_new_crime: {
 				Crime crime = new Crime();
 				CrimeLab.getInstance(getActivity()).addCrime(crime);
-				Intent intent = CrimePagerActivity.newIntent(getActivity(), crime.getId());
-				startActivity(intent);
+				updateUI();
+				callbacks.onCrimeSelected(crime);
 				return true;
 			}
 			case R.id.menu_item_show_subtitle: {
@@ -104,7 +107,24 @@ public class CrimeListFragment extends Fragment {
 		}
 	}
 
-	private void updateUI() {
+	@Override
+	public void onAttach(Context context) {
+		super.onAttach(context);
+		if(context instanceof Callbacks) {
+			callbacks = (Callbacks) context;
+		} else {
+			throw new IllegalStateException("Host activity must implements Callbacks interface");
+		}
+
+	}
+
+	@Override
+	public void onDetach() {
+		super.onDetach();
+		callbacks = null;
+	}
+
+	public void updateUI() {
 		CrimeLab crimeLab = getCrimeLab();
 		List<Crime> crimes = crimeLab.getCrimeList();
 		if (adapter == null) {
@@ -159,8 +179,7 @@ public class CrimeListFragment extends Fragment {
 
 		@Override
 		public void onClick(View v) {
-			Intent intent = CrimePagerActivity.newIntent(getContext(), crime.getId());
-			startActivityForResult(intent, REQUEST_CRIME_EDIT);
+			callbacks.onCrimeSelected(crime);
 		}
 	}
 
@@ -192,8 +211,10 @@ public class CrimeListFragment extends Fragment {
 		private void setCrimes(List<Crime> crimes) {
 			this.crimeList = new ArrayList<>(crimes);
 		}
+	}
 
-
+	public interface Callbacks {
+		void onCrimeSelected(Crime crime);
 	}
 
 
