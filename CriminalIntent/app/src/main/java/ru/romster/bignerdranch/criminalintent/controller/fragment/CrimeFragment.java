@@ -16,6 +16,7 @@ import android.text.format.DateFormat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -41,6 +42,7 @@ public class CrimeFragment extends Fragment {
 
 	private static final String ARG_CRIME_ID = "crime_id";
 	private static final String DIALOG_DATE = "DialogDate";
+	private static final String DIALOG_PHOTO = "DialogPhoto";
 
 	private static final int REQUEST_DATE = 0;
 	private static final int REQUEST_CONTACT = 1;
@@ -160,10 +162,24 @@ public class CrimeFragment extends Fragment {
 		});
 
 		photoView = (ImageView) v.findViewById(R.id.crime_photo);
-		updatePhotoView();
+		photoView.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				FragmentManager fragmentManager = getFragmentManager();
+				PhotoViewFragment dialog = PhotoViewFragment.newInstance(photoFile.getPath());
+				dialog.show(fragmentManager, DIALOG_PHOTO);
+			}
+		});
 
+		ViewTreeObserver viewTreeObserver = photoView.getViewTreeObserver();
+		viewTreeObserver.addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				photoView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				updatePhotoView();
+			}
+		});
 		return v;
-
 	}
 
 	@Override
@@ -211,7 +227,7 @@ public class CrimeFragment extends Fragment {
 		if(photoFile == null || ! photoFile.exists()) {
 			photoView.setImageDrawable(null);
 		} else {
-			Bitmap bitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), getActivity());
+			Bitmap bitmap = PictureUtils.getScaledBitmap(photoFile.getPath(), photoView.getWidth(), photoView.getHeight());
 			photoView.setImageBitmap(bitmap);
 		}
 	}
