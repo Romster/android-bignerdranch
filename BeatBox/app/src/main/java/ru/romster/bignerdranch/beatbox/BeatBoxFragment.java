@@ -28,6 +28,12 @@ public class BeatBoxFragment extends Fragment {
 		return fragment;
 	}
 
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setRetainInstance(true);
+	}
+
 	@Nullable
 	@Override
 	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -41,18 +47,30 @@ public class BeatBoxFragment extends Fragment {
 		return v;
 	}
 
-	private class SoundHolder extends RecyclerView.ViewHolder {
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+		beatBox.release();
+	}
+
+	private class SoundHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 		private Button button;
 		private Sound sound;
 
 		public SoundHolder(LayoutInflater layoutInflater, ViewGroup container) {
 			super(layoutInflater.inflate(R.layout.list_item_sound, container, false));
 			button = (Button) itemView.findViewById(R.id.list_item_sound_button);
+			button.setOnClickListener(this);
 		}
 
 		public void bindSound(Sound sound) {
 			this.sound = sound;
 			this.button.setText(sound.getName());
+		}
+
+		@Override
+		public void onClick(View v) {
+			beatBox.play(sound);
 		}
 	}
 
