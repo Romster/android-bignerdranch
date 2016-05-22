@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:tools="http://schemas.android.com/tools"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content">
+	<ImageView
+		android:id="@+id/activity_icon"
+		android:layout_width="64dp"
+		android:layout_height="64dp"
+		android:layout_marginLeft="8dp"
+		android:layout_marginRight="8dp"
+		android:layout_alignParentLeft="true"
+		android:src="@android:drawable/alert_dark_frame"
+		android:scaleType="centerCrop"/>
+	<TextView
+		android:id="@+id/activity_name"
+		tools:text="test"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_centerVertical="true"
+		android:layout_toRightOf="@+id/activity_icon"
+		android:layout_toEndOf="@+id/activity_icon"/>
+
+</RelativeLayout>
