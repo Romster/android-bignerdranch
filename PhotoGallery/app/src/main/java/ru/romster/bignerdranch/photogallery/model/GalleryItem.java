@@ -1,11 +1,17 @@
 package ru.romster.bignerdranch.photogallery.model;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Created by romster on 25/05/16.
  */
 public class GalleryItem {
+
+	@SerializedName("title")
 	private String caption;
+	@SerializedName("id")
 	private String id;
+	@SerializedName("url_s")
 	private String url;
 
 	@Override

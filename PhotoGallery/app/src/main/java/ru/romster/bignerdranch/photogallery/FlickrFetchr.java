@@ -3,9 +3,13 @@ package ru.romster.bignerdranch.photogallery;
 import android.net.Uri;
 import android.util.Log;
 
-import org.json.JSONArray;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -39,8 +43,9 @@ public class FlickrFetchr {
 					.appendQueryParameter("extras", "url_s")
 					.build().toString();
 			String jsonString =  getUrlString(url);
-			JSONObject jsonObject = new JSONObject(jsonString);
-			parseItems(galleryItems, jsonObject);
+			JsonElement jsonBody = new JsonParser().parse(jsonString);
+			Log.i(TAG, "JSON: " + jsonString);
+			parseItems(galleryItems, jsonBody);
 		} catch (IOException ex) {
 			Log.e(TAG, "Failed to fetch URL: ", ex);
 		} catch (JSONException ex) {
@@ -78,23 +83,16 @@ public class FlickrFetchr {
 		return new String(getUrlBytes(urlString));
 	}
 
-	private static void parseItems(List<GalleryItem> galleryItems, JSONObject jsonBody) throws JSONException {
-		JSONObject photosJsonObject = jsonBody.getJSONObject("photos");
-		JSONArray photoJsonArray = photosJsonObject.getJSONArray("photo");
 
-		for(int i = 0; i < photoJsonArray.length(); i++) {
-			JSONObject photoJsonObject = photoJsonArray.getJSONObject(i);
+	private static void parseItems(List<GalleryItem> galleryItems, JsonElement jsonBody) throws JSONException {
+		JsonObject photosJsonObject = jsonBody.getAsJsonObject().getAsJsonObject("photos");
+		JsonArray photoJsonArray = photosJsonObject.getAsJsonArray("photo");
 
-			String smallPhotoUrl = photoJsonObject.optString("url_s", null);
-			if(smallPhotoUrl == null)  continue;
+		Gson gson = new Gson();
 
-			GalleryItem galleryItem = new GalleryItem();
-
-			galleryItem.setId(photoJsonObject.getString("id"));
-			galleryItem.setCaption(photoJsonObject.getString("title"));
-			galleryItem.setUrl(smallPhotoUrl);
-
-			galleryItems.add(galleryItem);
+		for(int i = 0; i < photoJsonArray.size(); i++) {
+			GalleryItem item = gson.fromJson(photoJsonArray.get(i), GalleryItem.class);
+			if(item.getUrl() != null) galleryItems.add(item);
 		}
 	}
 
