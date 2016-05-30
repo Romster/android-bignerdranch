@@ -9,7 +9,9 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +25,13 @@ public class PhotoGalleryFragment extends Fragment {
 
 	private static final String TAG = PhotoGalleryFragment.class.getName();
 
+	private boolean wasScrolledDown = false;
+	private boolean ignoreScrollEvents = false;
 
 	private RecyclerView photoRecyclerView;
 	private List<GalleryItem> galleryItems = new ArrayList<>();
+
+	private FlickrFetchr flickrFetchr;
 
 	public static PhotoGalleryFragment newInstance() {
 
@@ -40,6 +46,9 @@ public class PhotoGalleryFragment extends Fragment {
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setRetainInstance(true);
+		ignoreScrollEvents = false;
+		wasScrolledDown = false;
+		flickrFetchr = new FlickrFetchr();
 		new FetchItemsTask().execute();
 	}
 
@@ -49,17 +58,30 @@ public class PhotoGalleryFragment extends Fragment {
 		View v = inflater.inflate(R.layout.fragment_photo_gallery, container, false);
 
 		photoRecyclerView = (RecyclerView) v.findViewById(R.id.photo_gallery_recycler_view);
-		photoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
+
+		photoRecyclerView.addOnScrollListener(new OnScrollListener());
+		photoRecyclerView.setAdapter(new PhotoAdapter());
+
+		photoRecyclerView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+			@Override
+			public void onGlobalLayout() {
+				photoRecyclerView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+				int columnsCount = photoRecyclerView.getWidth() / 500;
+				photoRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), columnsCount));
+			}
+		});
 
 		return v;
 	}
 
 	private void setupAdapter() {
-		if(isAdded()) {
-			photoRecyclerView.setAdapter(new PhotoAdapter(galleryItems));
+		if (isAdded()) {
+			if (photoRecyclerView.getAdapter() == null)
+				photoRecyclerView.setAdapter(new PhotoAdapter());
+			else
+				photoRecyclerView.getAdapter().notifyDataSetChanged();
 		}
 	}
-
 
 
 	private class PhotoHolder extends RecyclerView.ViewHolder {
@@ -77,11 +99,7 @@ public class PhotoGalleryFragment extends Fragment {
 
 
 	private class PhotoAdapter extends RecyclerView.Adapter<PhotoHolder> {
-		private List<GalleryItem> galleryItems;
 
-		public PhotoAdapter(List<GalleryItem> galleryItems) {
-			this.galleryItems = galleryItems;
-		}
 
 		@Override
 		public PhotoHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -93,6 +111,10 @@ public class PhotoGalleryFragment extends Fragment {
 		public void onBindViewHolder(PhotoHolder holder, int position) {
 			GalleryItem galleryItem = galleryItems.get(position);
 			holder.bindGalleryItem(galleryItem);
+			if (position >= galleryItems.size() * 5 / 6 && wasScrolledDown && !ignoreScrollEvents) {
+				ignoreScrollEvents = true;
+				new FetchItemsTask().execute();
+			}
 		}
 
 		@Override
@@ -102,15 +124,37 @@ public class PhotoGalleryFragment extends Fragment {
 	}
 
 	private class FetchItemsTask extends AsyncTask<Void, Void, List<GalleryItem>> {
+
+		@Override
+		protected void onPreExecute() {
+		}
+
 		@Override
 		protected List<GalleryItem> doInBackground(Void... params) {
-			return new FlickrFetchr().fetchItems();
+			return flickrFetchr.fetchItems(flickrFetchr.getCurrentPage() + 1);
 		}
 
 		@Override
 		protected void onPostExecute(List<GalleryItem> galleryItems) {
-			PhotoGalleryFragment.this.galleryItems = galleryItems;
+			PhotoGalleryFragment.this.galleryItems.addAll(galleryItems);
 			setupAdapter();
+			Toast.makeText(getActivity(), "Page: " + flickrFetchr.getCurrentPage(), Toast.LENGTH_SHORT).show();
+			ignoreScrollEvents = false;
+			wasScrolledDown = false;
+		}
+	}
+
+	private class OnScrollListener extends RecyclerView.OnScrollListener {
+
+		@Override
+		public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+			//nothing
+		}
+
+		@Override
+		public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+			super.onScrolled(recyclerView, dx, dy);
+			wasScrolledDown = !ignoreScrollEvents && dy > 0;
 		}
 	}
 }

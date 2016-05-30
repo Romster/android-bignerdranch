@@ -26,11 +26,14 @@ import ru.romster.bignerdranch.photogallery.model.GalleryItem;
  */
 public class FlickrFetchr {
 
+
 	private static final String TAG = FlickrFetchr.class.getName();
 
 	public static final String API_KEY = "ad158930d3f41bb6f26b39eded421e83";
 
-	public List<GalleryItem> fetchItems() {
+	private int currentPage = 0;
+
+	public List<GalleryItem> fetchItems(int pageNum) {
 		List<GalleryItem> galleryItems = new ArrayList<>();
 
 		try {
@@ -41,11 +44,14 @@ public class FlickrFetchr {
 					.appendQueryParameter("format", "json")
 					.appendQueryParameter("nojsoncallback", "1")
 					.appendQueryParameter("extras", "url_s")
+					.appendQueryParameter("page", String.valueOf(pageNum))
 					.build().toString();
 			String jsonString =  getUrlString(url);
 			JsonElement jsonBody = new JsonParser().parse(jsonString);
 			Log.i(TAG, "JSON: " + jsonString);
 			parseItems(galleryItems, jsonBody);
+
+			this.currentPage = pageNum;
 		} catch (IOException ex) {
 			Log.e(TAG, "Failed to fetch URL: ", ex);
 		} catch (JSONException ex) {
@@ -53,6 +59,8 @@ public class FlickrFetchr {
 		}
 		return galleryItems;
 	}
+
+
 
 	public byte[] getUrlBytes(String urlString) throws IOException {
 		URL url = new URL(urlString);
@@ -67,7 +75,7 @@ public class FlickrFetchr {
 						+ ": with " + urlString);
 			}
 
-			int bytesRead = 0;
+			int bytesRead;
 			byte[] buffer = new byte[1024];
 			while ((bytesRead = in.read(buffer)) > 0) {
 				out.write(buffer, 0, bytesRead);
@@ -83,10 +91,20 @@ public class FlickrFetchr {
 		return new String(getUrlBytes(urlString));
 	}
 
+	public int getCurrentPage() {
+		return currentPage;
+	}
 
-	private static void parseItems(List<GalleryItem> galleryItems, JsonElement jsonBody) throws JSONException {
+	private void parseItems(List<GalleryItem> galleryItems, JsonElement jsonBody) throws JSONException {
 		JsonObject photosJsonObject = jsonBody.getAsJsonObject().getAsJsonObject("photos");
 		JsonArray photoJsonArray = photosJsonObject.getAsJsonArray("photo");
+
+		currentPage = photosJsonObject.getAsJsonPrimitive("page").getAsInt();
+		int maxPage = photosJsonObject.getAsJsonPrimitive("pages").getAsInt();
+
+		if(currentPage > maxPage) {
+			currentPage = maxPage;
+		}
 
 		Gson gson = new Gson();
 
